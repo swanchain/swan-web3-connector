@@ -146,6 +146,11 @@ wallet.disconnect();
 - Safari (Latest 2 versions)
 - Edge (Latest 2 versions)
 
+# Best Practice 
+- Clone the repo
+- Run ```python3 -m http.server 8000```
+- See ```test.html```
+
 ## Contributing
 
 We welcome contributions! Please feel free to submit a Pull Request.

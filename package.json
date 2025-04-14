@@ -1,7 +1,7 @@
 {
-  "name": "swan-wallet-connector",
+  "name": "swan-web3-connector",
   "version": "1.0.0",
-  "description": "A wallet connector for Ethereum wallets",
+  "description": "A universal Web3 wallet connector for Vue and React applications with a user-friendly interface",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -13,8 +13,17 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SwanCloudInc/swan_wallet_connecter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SwanCloudInc/swan_wallet_connecter/issues"
+  },
+  "homepage": "https://github.com/SwanCloudInc/swan_wallet_connecter#readme",
   "dependencies": {
     "ethers": "^6.7.0"
   },
@@ -34,7 +43,11 @@
     "wallet",
     "web3",
     "metamask",
-    "okx"
+    "okx",
+    "vue",
+    "react",
+    "connector",
+    "blockchain"
   ],
   "author": "Swan Cloud Inc",
   "license": "MIT"
