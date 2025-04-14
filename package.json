@@ -1,0 +1,37 @@
+{
+  "name": "swan-web3-connector",
+  "version": "1.0.0",
+  "description": "A universal Web3 wallet connector for Vue and React applications with user-friendly interface",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "web3",
+    "ethereum",
+    "wallet",
+    "connect",
+    "vue",
+    "react",
+    "metamask",
+    "web3-wallet",
+    "dapp"
+  ],
+  "author": "Swan Cloud Inc.",
+  "license": "MIT",
+  "peerDependencies": {
+    "ethers": "^6.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "rollup": "^3.20.0",
+    "rollup-plugin-terser": "^7.0.2"
+  }
+}

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Connector Test</title>
+    <style>
+        .wallet-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            min-width: 200px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wallet-button:hover {
+            background-color: #45a049;
+        }
+        .wallet-info {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .chain-button {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        .chain-button:hover {
+            background-color: #0b7dda;
+        }
+        .sign-button {
+            padding: 10px 20px;
+            background-color: #9c27b0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .sign-button:hover {
+            background-color: #7b1fa2;
+        }
+        .signature-result {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .signature-result pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wallet Connector Test</h1>
+    <div id="wallet-container"></div>
+    <div id="chain-buttons" style="margin-top: 20px;"></div>
+    <div id="sign-section" style="margin-top: 20px; display: none;">
+        <h3>Sign Message Test</h3>
+        <input type="text" id="message-input" placeholder="Enter message to sign" 
+               style="padding: 8px; width: 300px; margin-right: 10px; border: 1px solid #ddd; border-radius: 4px;">
+        <button class="sign-button" onclick="signMessage()">Sign Message</button>
+        <div id="signature-result" class="signature-result" style="display: none;"></div>
+    </div>
+    <div id="wallet-info" class="wallet-info"></div>
+
+    <!-- Load ethers.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+
+    <script type="module">
+        import { WalletButton } from './dist/index.js';
+
+        // Chain configurations
+        const chains = {
+            ethereum: {
+                chainId: '0x1',
+                chainName: 'Ethereum Mainnet',
+                nativeCurrency: {
+                    name: 'ETH',
+                    symbol: 'ETH',
+                    decimals: 18
+                },
+                rpcUrls: ['https://mainnet.infura.io/v3/'],
+                blockExplorerUrls: ['https://etherscan.io']
+            },
+            polygon: {
+                chainId: '0x89',
+                chainName: 'Polygon Mainnet',
+                nativeCurrency: {
+                    name: 'MATIC',
+                    symbol: 'MATIC',
+                    decimals: 18
+                },
+                rpcUrls: ['https://polygon-rpc.com'],
+                blockExplorerUrls: ['https://polygonscan.com']
+            }
+        };
+
+        // Create and configure the wallet button
+        const walletButton = new WalletButton({
+            buttonText: 'Connect Wallet',
+            buttonClass: 'wallet-button',
+            onConnect: (wallet) => {
+                const infoDiv = document.getElementById('wallet-info');
+                infoDiv.innerHTML = `
+                    <p>Connected Account: ${wallet.account}</p>
+                    <p>Chain ID: ${wallet.chainId}</p>
+                    <p>Balance: ${wallet.balance} ETH</p>
+                `;
+                
+                // Show chain buttons and sign section after connection
+                showChainButtons();
+                document.getElementById('sign-section').style.display = 'block';
+            },
+            onError: (error) => {
+                console.error('Connection error:', error);
+                alert('Error connecting wallet: ' + error.message);
+            }
+        });
+
+        // Mount the button
+        walletButton.mount('#wallet-container');
+
+        // Function to show chain switching buttons
+        function showChainButtons() {
+            const container = document.getElementById('chain-buttons');
+            container.innerHTML = '<h3>Switch Chain:</h3>';
+            
+            Object.entries(chains).forEach(([name, chain]) => {
+                const button = document.createElement('button');
+                button.className = 'chain-button';
+                button.textContent = `Switch to ${chain.chainName}`;
+                button.onclick = async () => {
+                    try {
+                        await walletButton.wallet.checkAndSwitchChain(chain);
+                        const infoDiv = document.getElementById('wallet-info');
+                        infoDiv.innerHTML = `
+                            <p>Connected Account: ${walletButton.wallet.account}</p>
+                            <p>Chain ID: ${walletButton.wallet.chainId}</p>
+                            <p>Balance: ${walletButton.wallet.balance} ETH</p>
+                            <p>Switched to: ${chain.chainName}</p>
+                        `;
+                    } catch (error) {
+                        console.error('Chain switch error:', error);
+                        alert('Error switching chain: ' + error.message);
+                    }
+                };
+                container.appendChild(button);
+            });
+        }
+
+        // Check initial connection status
+        walletButton.checkConnection().then(isConnected => {
+            if (isConnected) {
+                const infoDiv = document.getElementById('wallet-info');
+                infoDiv.innerHTML = `
+                    <p>Connected Account: ${walletButton.wallet.account}</p>
+                    <p>Chain ID: ${walletButton.wallet.chainId}</p>
+                    <p>Balance: ${walletButton.wallet.balance} ETH</p>
+                `;
+                showChainButtons();
+                document.getElementById('sign-section').style.display = 'block';
+            }
+        });
+
+        // Expose the wallet button instance to window for the sign function
+        window.walletButton = walletButton;
+    </script>
+
+    <script>
+        async function signMessage() {
+            try {
+                const messageInput = document.getElementById('message-input');
+                const message = messageInput.value.trim();
+                
+                if (!message) {
+                    alert('Please enter a message to sign');
+                    return;
+                }
+
+                const signature = await window.walletButton.wallet.signMessage(message);
+                
+                const resultDiv = document.getElementById('signature-result');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <h4>Signature Result:</h4>
+                    <p><strong>Message:</strong> ${message}</p>
+                    <p><strong>Signature:</strong></p>
+                    <pre>${signature}</pre>
+                `;
+            } catch (error) {
+                console.error('Signing error:', error);
+                alert('Error signing message: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html> 
